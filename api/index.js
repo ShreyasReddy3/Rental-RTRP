@@ -80,15 +80,6 @@ async function setupDatabase() {
         VALUES ('Welcome!', 'Welcome to Rental Hub.', 'info', false)
       `);
     }
-
-    const userCountRes = await client.query('SELECT COUNT(*) as count FROM users');
-    if (parseInt(userCountRes.rows[0].count) === 0) {
-      const hashedPassword = await bcrypt.hash('password', 10);
-      await client.query(
-        'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)',
-        ['Default User', 'user@example.com', hashedPassword, 'Bachelor']
-      );
-    }
   } finally {
     client.release();
   }

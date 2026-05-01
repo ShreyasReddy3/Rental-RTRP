@@ -101,8 +101,15 @@ class Store {
       body: JSON.stringify({ name, email, password, role })
     });
     if (!res.ok) {
-       const err = await res.json();
-       throw new Error(err.error || 'Registration failed');
+       let errMsg = 'Registration failed';
+       try {
+         const err = await res.json();
+         errMsg = err.error || errMsg;
+       } catch (e) {
+         // If response is not JSON (e.g. Vercel 500 error page)
+         errMsg = `Server error (${res.status}). Please try again.`;
+       }
+       throw new Error(errMsg);
     }
     return this.login(email, password);
   }
