@@ -1,8 +1,10 @@
-const express = require('express');
-const cors = require('cors');
-const { Pool } = require('pg');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+import express from 'express';
+import cors from 'cors';
+import pg from 'pg';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+
+const { Pool } = pg;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_jwt_key_123';
 
@@ -245,4 +247,4 @@ app.patch('/api/notifications/read', async (req, res) => {
 });
 
 // Export the app for Vercel Serverless
-module.exports = app;
+export default app;
