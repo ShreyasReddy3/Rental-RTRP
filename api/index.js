@@ -80,6 +80,15 @@ async function setupDatabase() {
         VALUES ('Welcome!', 'Welcome to Rental Hub.', 'info', false)
       `);
     }
+
+    const userCountRes = await client.query('SELECT COUNT(*) as count FROM users');
+    if (parseInt(userCountRes.rows[0].count) === 0) {
+      const hashedPassword = await bcrypt.hash('password', 10);
+      await client.query(
+        'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)',
+        ['Default User', 'user@example.com', hashedPassword, 'Bachelor']
+      );
+    }
   } finally {
     client.release();
   }
@@ -138,11 +147,11 @@ app.get('/api/properties', async (req, res) => {
     const result = await pool.query('SELECT * FROM properties');
     const properties = result.rows;
     properties.forEach(p => {
-      try { p.amenities = JSON.parse(p.amenities); } catch(e) { p.amenities = []; }
-      try { p.target = JSON.parse(p.target); } catch(e) { p.target = []; }
+      try { p.amenities = JSON.parse(p.amenities); } catch (e) { p.amenities = []; }
+      try { p.target = JSON.parse(p.target); } catch (e) { p.target = []; }
     });
     res.json(properties);
-  } catch(e) { res.status(500).json({error: e.message}); }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.post('/api/properties', async (req, res) => {
@@ -153,10 +162,10 @@ app.post('/api/properties', async (req, res) => {
       [title, type, price, location, distance, JSON.stringify(amenities || []), image, JSON.stringify(target || []), ownerId || 'me']
     );
     const newProperty = result.rows[0];
-    try { newProperty.amenities = JSON.parse(newProperty.amenities); } catch(e) { newProperty.amenities = []; }
-    try { newProperty.target = JSON.parse(newProperty.target); } catch(e) { newProperty.target = []; }
+    try { newProperty.amenities = JSON.parse(newProperty.amenities); } catch (e) { newProperty.amenities = []; }
+    try { newProperty.target = JSON.parse(newProperty.target); } catch (e) { newProperty.target = []; }
     res.json(newProperty);
-  } catch(e) { res.status(500).json({error: e.message}); }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.delete('/api/properties/:id', async (req, res) => {
@@ -189,7 +198,7 @@ app.get('/api/bookings', async (req, res) => {
       }
     }));
     res.json(formatted);
-  } catch(e) { res.status(500).json({error: e.message}); }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.post('/api/bookings', async (req, res) => {
